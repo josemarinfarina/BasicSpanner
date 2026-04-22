@@ -1,0 +1,75 @@
+name: Windows Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test-build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.*'
+        arch: 'win64_msvc2022_64'
+        modules: qtcharts
+    
+    - name: Setup Visual Studio
+      uses: microsoft/setup-msbuild@v1.1
+    
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.13
+      with:
+        cmake-version: '3.25.0'
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Configure CMake
+      run: |
+        cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ env.QT_ROOT_DIR }};${{ env.QTDIR }}"
+    
+    - name: Build project
+      run: |
+        cmake --build build --config Release --parallel
+    
+    - name: Verify executable
+      run: |
+        if (Test-Path "build\Release\BasicSpanner.exe") {
+          Write-Host "Executable created successfully"
+          Get-ChildItem "build\Release\BasicSpanner.exe" | Select-Object Name, Length
+        } else {
+          Write-Host "Executable not found"
+          exit 1
+        }
+    
+    - name: Test basic functionality
+      run: |
+        Write-Host "Testing basic functionality..."
+        if (Test-Path "build\Release\verify_basic_network.exe") {
+          Write-Host "Verification executable found"
+        } else {
+          Write-Host "Verification executable not found (optional)"
+        }
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: BasicSpanner-Windows-${{ github.sha }}
+        path: build/Release/
+        retention-days: 7 

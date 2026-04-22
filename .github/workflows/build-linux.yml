@@ -1,0 +1,78 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Try Setup Qt 6.9 (aqt)
+      id: qt
+      continue-on-error: true
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.*'
+        arch: 'gcc_64'
+        modules: qtcharts
+
+    - name: Diagnose Qt availability
+      if: steps.qt.outcome == 'failure'
+      run: |
+        python3 -m pip install --upgrade pip aqtinstall==3.3.*
+        python3 -m aqt version
+        python3 -m aqt list-qt linux desktop --arch 6.9.1 || true
+        python3 -m aqt list-qt linux desktop --modules 6.9.1 gcc_64 || true
+
+    - name: Fallback install Qt from apt (qt6-base-dev, qt6-charts-dev)
+      if: steps.qt.outcome == 'failure'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qt6-base-dev qt6-charts-dev
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.13
+      with:
+        cmake-version: '3.25.0'
+
+    - name: Set CMAKE_PREFIX_PATH
+      run: |
+        if [ -n "${QTDIR:-}" ]; then
+          echo "CMAKE_PREFIX_PATH=$QTDIR" >> "$GITHUB_ENV"
+        else
+          echo "CMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake" >> "$GITHUB_ENV"
+        fi
+
+    - name: Configure CMake
+      run: |
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$CMAKE_PREFIX_PATH"
+
+    - name: Build
+      run: |
+        cmake --build build --parallel
+
+    - name: Verify executable
+      run: |
+        if [ -f "build/BasicSpanner" ]; then
+          echo "Executable created: build/BasicSpanner"
+        else
+          echo "Executable not found" && exit 1
+        fi
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: BasicSpanner-Linux-${{ github.sha }}
+        path: |
+          build/BasicSpanner
+        retention-days: 14 
