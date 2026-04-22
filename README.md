@@ -12,6 +12,10 @@ Interactive C++/Qt6 application that computes **basic networks** from an input g
 [![Download Linux](https://img.shields.io/badge/download-Linux%20Build-blue.svg?style=for-the-badge&logo=linux)]()
 
 
+![Frontend Screenshot](./images/frontend.png)
+
+
+
 
 ## License
 
