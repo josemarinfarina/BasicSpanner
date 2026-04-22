@@ -4,10 +4,15 @@
   "description": "Extreme graph simplification applied to functional discovery in biological networks.",
   "creators": [
     {
-      "name": "Marín, José et al."
+      "name": "Marín, José",
+      "orcid": "0009-0005-1477-2866"
+    },
+    {
+      "name": "Marín, Ignacio",
+      "orcid": "0000-0002-1315-8961"
     }
   ],
-  "license": "MIT",
+  "license": "mit",
   "keywords": ["graph", "network", "biology", "software"],
-  "version": "v.1.0.0-Z"
+  "version": "v.1.0.1"
 }
