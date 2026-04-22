@@ -1,0 +1,13 @@
+{
+  "title": "BasicSpanner",
+  "upload_type": "software",
+  "description": "Extreme graph simplification applied to functional discovery in biological networks.",
+  "creators": [
+    {
+      "name": "Marín, José et al."
+    }
+  ],
+  "license": "MIT",
+  "keywords": ["graph", "network", "biology", "software"],
+  "version": "v.1.0.0-Z"
+}
