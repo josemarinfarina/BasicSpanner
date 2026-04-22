@@ -44,11 +44,11 @@ void NodeListPanel::setupUI()
     layout->addWidget(countLabel_);
 
     nodeTable_ = new QTableWidget;
-    nodeTable_->setColumnCount(7);
-    nodeTable_->setHorizontalHeaderLabels({"Node", "Type", "Deg(G)", "Deg(L)", "Betw(G)", "Betw(L)", "Freq %"});
+    nodeTable_->setColumnCount(5);
+    nodeTable_->setHorizontalHeaderLabels({"Node", "Type", "Deg(G)", "Deg(L)", "Freq %"});
     nodeTable_->horizontalHeader()->setStretchLastSection(false);
     nodeTable_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    for (int col = 1; col < 7; ++col) {
+    for (int col = 1; col < 5; ++col) {
         nodeTable_->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
     }
     nodeTable_->verticalHeader()->setVisible(false);
@@ -241,16 +241,6 @@ void NodeListPanel::filterNodes(const QString& filter)
             degLItem->setTextAlignment(Qt::AlignCenter);
             nodeTable_->setItem(row, 3, degLItem);
             
-            QTableWidgetItem* betwGItem = new QTableWidgetItem();
-            betwGItem->setData(Qt::DisplayRole, QString::number(nodeData.betweennessGeneral, 'f', 4));
-            betwGItem->setTextAlignment(Qt::AlignCenter);
-            nodeTable_->setItem(row, 4, betwGItem);
-            
-            QTableWidgetItem* betwLItem = new QTableWidgetItem();
-            betwLItem->setData(Qt::DisplayRole, QString::number(nodeData.betweennessLocal, 'f', 4));
-            betwLItem->setTextAlignment(Qt::AlignCenter);
-            nodeTable_->setItem(row, 5, betwLItem);
-            
             QTableWidgetItem* freqItem = new QTableWidgetItem();
             if (nodeData.frequency > 0) {
                 freqItem->setData(Qt::DisplayRole, QString::number(nodeData.frequency, 'f', 1));
@@ -266,7 +256,7 @@ void NodeListPanel::filterNodes(const QString& filter)
                 freqItem->setForeground(QColor(71, 85, 105));
             }
             freqItem->setTextAlignment(Qt::AlignCenter);
-            nodeTable_->setItem(row, 6, freqItem);
+            nodeTable_->setItem(row, 4, freqItem);
             
             visibleCount++;
         }

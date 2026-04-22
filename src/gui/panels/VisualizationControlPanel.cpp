@@ -49,7 +49,6 @@ void VisualizationControlPanel::setupUI()
     layoutTypeCombo_ = new QComboBox;
     layoutTypeCombo_->addItem("Automatic", static_cast<int>(LayoutType::Automatic));
     layoutTypeCombo_->addItem("Yifan Hu", static_cast<int>(LayoutType::YifanHu));
-    layoutTypeCombo_->addItem("Force Atlas", static_cast<int>(LayoutType::ForceAtlas));
     layoutTypeCombo_->addItem("Spring Force", static_cast<int>(LayoutType::SpringForce));
     layoutTypeCombo_->addItem("Circular", static_cast<int>(LayoutType::Circular));
     layoutTypeCombo_->addItem("Hierarchical", static_cast<int>(LayoutType::Hierarchical));
@@ -219,11 +218,7 @@ void VisualizationControlPanel::setupAutomaticParamsUI()
     
     QLabel* infoLabel = new QLabel(
         "<b>Automatic Layout</b><br>"
-        "Selects the best algorithm based on graph size:<br>"
-        "• ≤12 nodes: Circular<br>"
-        "• ≤50 nodes: Yifan Hu<br>"
-        "• ≤200 nodes: Force Atlas<br>"
-        "• >200 nodes: Circular (fast)"
+        "Automatically selects the best layout algorithm based on graph size."
     );
     infoLabel->setWordWrap(true);
     layout->addWidget(infoLabel);
@@ -769,16 +764,32 @@ void VisualizationControlPanel::setEnabled(bool enabled)
 
 void VisualizationControlPanel::onLayoutTypeChanged()
 {
-    int index = getSelectedLayoutAlgorithm();
-    if (parametersStackedWidget_ && index >= 0 && index < parametersStackedWidget_->count()) {
-        parametersStackedWidget_->setCurrentIndex(index);
+    if (!layoutTypeCombo_) {
+        return;
     }
-    
-    if (layoutTypeCombo_) {
-        LayoutType selectedType = static_cast<LayoutType>(layoutTypeCombo_->currentData().toInt());
-        emit layoutAlgorithmChanged(static_cast<int>(selectedType));
+
+    LayoutType selectedType = static_cast<LayoutType>(layoutTypeCombo_->currentData().toInt());
+
+    int stackIndex = 0;
+    switch (selectedType) {
+        case LayoutType::Automatic:    stackIndex = 0; break;
+        case LayoutType::SeedCentric:  stackIndex = 1; break;
+        case LayoutType::FWTL:         stackIndex = 2; break;
+        case LayoutType::YifanHu:      stackIndex = 3; break;
+        case LayoutType::ForceAtlas:   stackIndex = 4; break;
+        case LayoutType::SpringForce:  stackIndex = 5; break;
+        case LayoutType::Circular:     stackIndex = 6; break;
+        case LayoutType::Hierarchical: stackIndex = 7; break;
+        case LayoutType::Grid:         stackIndex = 8; break;
+        case LayoutType::Random:       stackIndex = 9; break;
+        default:                       stackIndex = 0; break;
     }
-    
+
+    if (parametersStackedWidget_ && stackIndex >= 0 && stackIndex < parametersStackedWidget_->count()) {
+        parametersStackedWidget_->setCurrentIndex(stackIndex);
+    }
+
+    emit layoutAlgorithmChanged(static_cast<int>(selectedType));
     emit layoutTypeChanged();
 }
 
