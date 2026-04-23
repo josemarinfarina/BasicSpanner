@@ -1,0 +1,87 @@
+---
+title: "Algorithm"
+sidebar: documentation
+---
+
+The core of BasicSpanner implements the heuristic strategy devised by
+Marín & Hoyas (2009) to characterize basic networks, extended with a
+parallel execution layer.
+
+## Problem statement
+
+Let $G = (V, E)$ be an undirected graph and $S \subseteq V$ a set of seeds.
+A **basic network** is an induced subgraph $B = (V_B, E_B)$ with
+$S \subseteq V_B \subseteq V$ such that, for every pair of seeds
+$s_i, s_j \in S$:
+
+$$
+d_B(s_i, s_j) = d_G(s_i, s_j),
+$$
+
+and $|V_B|$ is minimal among all subgraphs with this property. The nodes in
+$V_B \setminus S$ are called **connectors**.
+
+Computing $V_B$ exactly is intractable for realistic graphs, since all
+subsets of $V \setminus S$ would in principle have to be inspected. The
+heuristic implemented in BasicSpanner converges to near-optimal basic
+networks in manageable time.
+
+## Heuristic strategy
+
+The algorithm proceeds in the following stages:
+
+1. **Initialization.** Seeds are marked as basic units; their pairwise
+   geodesic distances in $G$ are computed and stored.
+2. **Seed+n expansion.** All internal nodes of at least one seed-to-seed
+   geodesic are collected and classified as *seed+1, seed+2, ..., seed+n*
+   according to how far they lie from the seeds. Units that are strictly
+   necessary to preserve at least one geodesic distance are promoted to
+   basic units.
+3. **Path evaluation.** For each pair of seeds, alternative geodesic paths
+   are evaluated. Paths that traverse basic units or frequently reused
+   seed+n units are preferred; paths through sparsely reused units are
+   candidates for elimination.
+4. **Path pruning.** Non-essential alternative paths are removed whenever
+   doing so does not alter any seed-to-seed distance.
+5. **Replicated execution.** To mitigate convergence to suboptimal local
+   minima, the heuristic is executed over multiple randomized orderings.
+   Replicates can be:
+   - *Permutations* of a user-defined seed list, or
+   - independent *batches* of randomly drawn seeds (used to establish the
+     null distribution of connector counts).
+6. **Optional final pruning.** A final pass removes redundant connectors
+   from tied basic networks while preserving every seed-to-seed distance.
+   Pruning is generally required to reach the optimal basic network.
+
+## Parallel execution
+
+Each replicate is independent and is dispatched to a worker thread. A
+fixed-size thread pool consumes the replicate queue and accumulates the
+results. Accumulation of the connector-count distribution, real-time
+histogram updates and summary statistics are performed on a single
+accumulator thread to avoid contention.
+
+## Significance of observed connectors
+
+Random seed batches provide a null distribution for the number of
+connectors. For a user-defined seed set, a one-sided comparison against
+this null indicates whether the seeds are more or less connected than
+expected by chance.
+
+In practice, $n = 100$ batches are typically sufficient to characterize
+the null; for larger analyses, $n = 20$ already yields stable results.
+
+## Implementation
+
+The main computational entry points live in the
+[`src/core`](https://github.com/josemarinfarina/BasicSpanner/tree/main/src/core)
+directory:
+
+- `BasicSpannerEngine` — orchestrates the analysis pipeline.
+- `BasicNetworkFinder` — computes a single basic network.
+- `ParallelBasicSpannerEngine` / `ParallelGraphAlgorithms` — thread-pool
+  based parallel execution.
+- `GraphAlgorithms` / `PaperAlgorithmHelpers` — low-level graph routines
+  (BFS, pruning, path enumeration).
+
+See the [API reference](../api/index.qmd) for a detailed breakdown.

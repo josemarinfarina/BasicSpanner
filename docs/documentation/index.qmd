@@ -1,0 +1,20 @@
+---
+title: "Documentation"
+sidebar: documentation
+---
+
+This section covers the installation, usage and technical background of the
+BasicSpanner desktop application.
+
+## Contents
+
+- [**Installation**](installation.qmd) — how to obtain the pre-built binaries
+  or build from source on Linux and Windows.
+- [**Getting started**](getting-started.qmd) — a minimal end-to-end walkthrough
+  using the example graph shipped with the repository.
+- [**Workflow**](workflow.qmd) — a detailed description of the graphical
+  interface and the analysis pipeline.
+- [**Algorithm**](algorithm.qmd) — formal statement of the heuristic used to
+  compute basic networks.
+- [**File formats**](file-formats.qmd) — accepted input formats and structure
+  of the exported results.

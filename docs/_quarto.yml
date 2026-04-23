@@ -1,0 +1,65 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "BasicSpanner"
+  description: "Desktop application for extreme graph simplification through basic networks."
+  site-url: "https://josemarinfarina.github.io/BasicSpanner/"
+  repo-url: "https://github.com/josemarinfarina/BasicSpanner"
+  repo-actions: [edit, issue]
+  page-navigation: true
+  search: true
+  favicon: ../images/frontend.png
+  navbar:
+    background: primary
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Documentation"
+        href: documentation/index.qmd
+      - text: "API"
+        href: api/index.qmd
+    right:
+      - icon: github
+        href: https://github.com/josemarinfarina/BasicSpanner
+        aria-label: GitHub
+  sidebar:
+    - id: documentation
+      title: "Documentation"
+      style: "docked"
+      background: light
+      contents:
+        - documentation/index.qmd
+        - documentation/installation.qmd
+        - documentation/getting-started.qmd
+        - documentation/workflow.qmd
+        - documentation/algorithm.qmd
+        - documentation/file-formats.qmd
+    - id: api
+      title: "API Reference"
+      style: "docked"
+      background: light
+      contents:
+        - api/index.qmd
+        - api/core.qmd
+        - api/algorithms.qmd
+        - api/gui.qmd
+  page-footer:
+    left: "BasicSpanner &copy; 2026 Jose Marin, Ignacio Marin. MIT License."
+    right:
+      - icon: github
+        href: https://github.com/josemarinfarina/BasicSpanner
+
+format:
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    anchor-sections: true
+    link-external-newwindow: true

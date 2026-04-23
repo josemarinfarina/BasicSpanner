@@ -1,0 +1,95 @@
+---
+title: "Core"
+sidebar: api
+---
+
+The `src/core` directory contains the platform-independent analysis layer.
+All classes in this module are pure C++17 and do not depend on Qt.
+
+## `Graph`
+
+Representation of an undirected graph with string or numeric node
+identifiers. Internally stores nodes by integer id; string labels are kept
+in a parallel mapping so that the same infrastructure can be used for both
+named graphs and purely numeric inputs.
+
+Header:
+[`src/core/Graph.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/Graph.h)
+
+Main operations:
+
+- `addNode(int id, const std::string& name = "")`
+- `addEdge(int u, int v)`
+- `neighbors(int u) const`
+- `degree(int u) const`
+- `isLargestConnectedComponent(int u) const`
+- Utility I/O for reading and writing edge lists.
+
+## `AnalysisConfig`
+
+Immutable configuration object that bundles all parameters of a single
+analysis: seed set, number of replicates, replicate mode (permutations vs.
+random batches), thread count, pruning flag and random seed for
+reproducibility.
+
+Header:
+[`src/core/AnalysisConfig.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/AnalysisConfig.h)
+
+## `BasicNetworkFinder`
+
+High-level facade that computes a single basic network for a given graph
+and seed set. Used as the reference implementation (without parallelism)
+and as the unit under test.
+
+Header:
+[`src/core/BasicNetworkFinder.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/BasicNetworkFinder.h)
+
+Related aggregate types:
+
+- `NetworkStatistics` — mean, standard deviation, min and max of a
+  collection of connector counts.
+- `StatisticalAnalysisResult` — result of comparing an experimental
+  analysis against a random null.
+
+## `BasicSpannerEngine`
+
+Single-threaded engine that orchestrates the full pipeline for a single
+replicate: initialization, seed+n expansion, path evaluation and optional
+pruning. Produces a `PermutationResult` containing the final basic
+network and per-replicate statistics.
+
+Header:
+[`src/core/BasicSpannerEngine.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/BasicSpannerEngine.h)
+
+Related aggregate types:
+
+- `PermutationStatistics` — counters of wins, losses and ties during the
+  path evaluation stage; also tracks which nodes participated in ties.
+
+## `ParallelBasicSpannerEngine`
+
+Multi-threaded driver that runs `BasicSpannerEngine` over multiple
+replicates concurrently using a fixed-size thread pool. Emits real-time
+events whenever a replicate finishes so that the GUI can update the
+connector-count histogram.
+
+Header:
+[`src/core/ParallelBasicSpannerEngine.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/ParallelBasicSpannerEngine.h)
+
+## `PathManager`
+
+Helper that caches geodesic distances and path sets between pairs of
+seeds, shared by the engine and the algorithms module. The cache is
+cleared between replicates.
+
+Header:
+[`src/core/PathManager.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/PathManager.h)
+
+## `ThreadPool`
+
+Lightweight fixed-size thread pool used by the parallel engine. Exposes
+a synchronous `submit` API and takes care of graceful shutdown when the
+engine is destroyed.
+
+Header:
+[`src/core/ThreadPool.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/ThreadPool.h)

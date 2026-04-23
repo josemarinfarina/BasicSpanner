@@ -1,0 +1,67 @@
+---
+title: "Algorithms"
+sidebar: api
+---
+
+Low-level graph algorithms used by the analysis engine live in
+`src/core/GraphAlgorithms.h`, `src/core/PaperAlgorithmHelpers.h` and their
+parallel counterparts.
+
+## `GraphAlgorithms`
+
+Static class grouping all single-threaded graph routines required by the
+basic-network heuristic.
+
+Header:
+[`src/core/GraphAlgorithms.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/GraphAlgorithms.h)
+
+### Shortest paths and distances
+
+- `getDistance(graph, source, target)` — single-pair BFS distance.
+- `getDistancesFromSource(graph, source)` — full single-source BFS.
+- `getAllPairDistances(graph, nodes)` — all-pairs distances restricted to a
+  node subset.
+- `getShortestPath(graph, source, target)` — one shortest path.
+- `getAllShortestPaths(graph, source, target)` — enumeration of all
+  shortest paths.
+- `getPathInfo(graph, source, target)` — distance and shortest-path set
+  bundled in a single `PathInfo`.
+
+### Basic-network specific
+
+- `getNodesInGeodesicPaths(...)` — internal nodes of all geodesics between
+  two seeds.
+- `getAllNodesInSeedGeodesics(...)` — internal nodes of every seed-to-seed
+  geodesic.
+- `preservesDistances(original, subgraph, seeds)` — check that a candidate
+  subgraph preserves every seed-to-seed distance.
+- `getSeedPlusOneNodes(...)` / `getSeedPlusNNodes(...)` — seed+n
+  classification used in the expansion phase.
+
+### Centrality
+
+- `betweennessCentrality(graph)` — Brandes' algorithm used by the
+  corresponding UI filter.
+
+### BFS primitives
+
+- `bfsDistances(graph, source)` and `bfsPredecessors(graph, source, target)`
+  are exposed for direct use when a custom traversal is needed.
+
+## `PaperAlgorithmHelpers`
+
+Helpers implementing the specific comparison and tie-breaking rules
+described in Marín & Hoyas (2009). These functions drive the path
+evaluation stage of the heuristic.
+
+Header:
+[`src/core/PaperAlgorithmHelpers.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/PaperAlgorithmHelpers.h)
+
+## `ParallelGraphAlgorithms`
+
+Parallel counterparts of the most CPU-bound routines. They are used when
+the input graph is large enough for thread-level parallelism to pay off
+(typically from a few thousand nodes upwards).
+
+Header:
+[`src/core/ParallelGraphAlgorithms.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/core/ParallelGraphAlgorithms.h)

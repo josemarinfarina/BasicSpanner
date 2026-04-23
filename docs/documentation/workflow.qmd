@@ -1,0 +1,75 @@
+---
+title: "Workflow"
+sidebar: documentation
+---
+
+BasicSpanner exposes the full analysis pipeline through a single graphical
+interface organized in two sidebars and a central viewer.
+
+![](../../images/frontend.png){fig-align="center" width="100%"}
+
+## Left sidebar
+
+### File Operations
+
+Imports graphs and seeds, keeps a history of recently opened files and
+exports the final analysis (edges, node metrics, Gephi metadata). Self-loops
+and isolated nodes are detected on import and reported in the status bar.
+
+### Node Filters
+
+A stackable list of filters that are applied sequentially to the input graph
+before any analysis. Available filters include:
+
+- **Degree range**: removes units whose degree is outside a given interval
+  (particularly useful to discard extremely high-degree hubs).
+- **Betweenness centrality**: keeps only nodes within a given centrality
+  range.
+- **Largest connected component**: restricts the analysis to the largest
+  connected component.
+- **Isolated-node removal**: removes nodes with no edges.
+- **Name patterns**: includes or excludes nodes whose identifier matches a
+  regular expression.
+
+Filters are reversible; deactivating one restores the removed nodes in
+subsequent analyses.
+
+## Central viewer
+
+The Viewer displays the current network using the layout selected in the
+**Visualization Controls** panel (Automatic, Circular, Yifan Hu, Spring
+Force, Hierarchical, Grid or Random). Seeds are drawn in red, connectors
+in blue. Nodes can also be colored according to degree or different
+centrality measures (closeness, betweenness, clustering coefficient,
+PageRank).
+
+Next to the viewer, the **Node List** tabulates every visible unit with its
+degree in the global network and in the basic network.
+
+## Bottom tabs
+
+- **Visualization Controls**: layout algorithm, parameters, view mode (Basic
+  network vs. full graph).
+- **Seed Selection**: loading from file or random generation.
+- **Algorithm Configuration**: number of replicates, replicate mode,
+  threads, pruning.
+- **Execution**: start, pause and cancel analyses.
+- **Results and Export**: per-replicate table, summary statistics and
+  export controls.
+
+## Real-time histogram
+
+During execution a floating window displays a histogram of connector counts
+as each replicate finishes, along with summary statistics (mean, median,
+standard deviation, range) and the raw per-replicate values. The histogram
+and table can be exported independently from the rest of the outputs.
+
+## Typical pipeline
+
+1. Import the network.
+2. Apply filters.
+3. Load or generate seeds.
+4. Configure replicates, threads and pruning.
+5. Run the analysis.
+6. Inspect the basic network and the distribution of connector counts.
+7. Export the edges, the node metrics and the Gephi metadata.

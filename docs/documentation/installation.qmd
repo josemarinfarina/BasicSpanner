@@ -1,0 +1,84 @@
+---
+title: "Installation"
+sidebar: documentation
+---
+
+BasicSpanner is distributed as pre-built binaries for Linux and Windows and
+also as buildable source code.
+
+## Pre-built binaries
+
+Precompiled binaries for each tagged release are available from the
+[GitHub Releases](https://github.com/josemarinfarina/BasicSpanner/releases)
+page. Each release contains two assets:
+
+- `BasicSpanner-Linux-<tag>.zip`
+- `BasicSpanner-Windows-<tag>.zip`
+
+Download the archive matching your platform, extract it and run the
+executable.
+
+### Linux
+
+```bash
+unzip BasicSpanner-Linux-v1.0.0.zip
+cd BasicSpanner-Linux-v1.0.0
+chmod +x BasicSpanner
+./BasicSpanner
+```
+
+If the executable cannot find Qt6 at runtime, make sure the required
+libraries are available, for example by using the Qt6 runtime provided by
+your distribution or a local Qt installation:
+
+```bash
+LD_LIBRARY_PATH=/path/to/Qt/6.9/gcc_64/lib:$LD_LIBRARY_PATH ./BasicSpanner
+```
+
+### Windows
+
+Unzip the archive and run `BasicSpanner.exe`. All required Qt DLLs are
+shipped alongside the executable.
+
+## Building from source
+
+### Requirements
+
+- CMake &ge; 3.16
+- A C++17 compiler (GCC 10+, Clang 12+, MSVC 2019+)
+- Qt 6.5 or newer with the `Core`, `Widgets` and `Charts` modules
+
+### Linux
+
+```bash
+git clone https://github.com/josemarinfarina/BasicSpanner.git
+cd BasicSpanner
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+./build/BasicSpanner
+```
+
+On Ubuntu/Debian systems the Qt6 development headers can be installed with:
+
+```bash
+sudo apt-get install qt6-base-dev qt6-charts-dev
+```
+
+### Windows
+
+```bat
+git clone https://github.com/josemarinfarina/BasicSpanner.git
+cd BasicSpanner
+cmake -B build -S . -G "Visual Studio 17 2022" -A x64 ^
+      -DCMAKE_BUILD_TYPE=Release ^
+      -DCMAKE_PREFIX_PATH="C:/Qt/6.9.1/msvc2022_64"
+cmake --build build --config Release --parallel
+```
+
+The resulting executable is written to `build\Release\BasicSpanner.exe`.
+
+## Continuous builds
+
+Builds are produced automatically by GitHub Actions whenever a new tag is
+pushed. See the workflows under
+[`.github/workflows`](https://github.com/josemarinfarina/BasicSpanner/tree/main/.github/workflows).

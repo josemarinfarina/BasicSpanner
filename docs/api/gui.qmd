@@ -1,0 +1,84 @@
+---
+title: "GUI"
+sidebar: api
+---
+
+The Qt-based interface lives in `src/gui/`. Top-level widgets are
+organized by function; individual panels live in `src/gui/panels/`.
+
+## Entry point
+
+[`src/main.cpp`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/main.cpp)
+builds the `QApplication`, installs the dark theme and stylesheet and
+shows the main window.
+
+## `MainWindow`
+
+Central widget that hosts every panel. Wires user actions to the
+`AppController`, propagates results to the visualization layer and
+handles the *About* dialog.
+
+Header:
+[`src/gui/MainWindow.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/gui/MainWindow.h)
+
+## `AppController`
+
+Bridge between the UI and the analysis engine. Receives configuration
+from the panels, builds an `AnalysisConfig`, dispatches the work to the
+`ParallelBasicSpannerEngine` on a worker thread and forwards progress
+events back to the UI on the GUI thread.
+
+Header:
+[`src/gui/AppController.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/gui/AppController.h)
+
+## Panels
+
+Each panel encapsulates a coherent subset of the configuration surface:
+
+| Panel                          | Role                                           |
+|-------------------------------|------------------------------------------------|
+| `FileOperationsPanel`         | Load graphs and seed files, manage history.    |
+| `GraphFilterPanel`            | Stackable pre-analysis filters.                |
+| `SeedSelectionPanel`          | Load, generate and edit seed sets.             |
+| `AlgorithmConfigPanel`        | Replicates, threads, pruning, random seed.     |
+| `ExecutionPanel`              | Start, pause, cancel and show progress.        |
+| `ResultsPanel`                | Per-replicate table and summary statistics.    |
+| `VisualizationControlPanel`   | Layout algorithm, view mode, node coloring.    |
+| `NodeListPanel`               | Tabular list of nodes in the basic network.    |
+
+Headers:
+[`src/gui/panels`](https://github.com/josemarinfarina/BasicSpanner/tree/main/src/gui/panels)
+
+## Visualization
+
+- `GraphVisualization` — `QGraphicsView`-based viewer responsible for
+  rendering nodes, edges, labels and for managing user interaction
+  (hover, selection, zoom).
+- `ParallelLayoutAlgorithms` — threaded implementations of the available
+  layout algorithms (Circular, Yifan Hu, Spring Force, Hierarchical,
+  Grid, Random).
+- `SplitGraphView` — side-by-side comparison of the full graph and the
+  basic network.
+- `RealTimeHistogramWindow` — floating window with the real-time
+  histogram, per-replicate table and summary statistics.
+
+Headers:
+[`src/gui/GraphVisualization.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/gui/GraphVisualization.h),
+[`src/gui/SplitGraphView.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/gui/SplitGraphView.h),
+[`src/gui/RealTimeHistogramWindow.h`](https://github.com/josemarinfarina/BasicSpanner/blob/main/src/gui/RealTimeHistogramWindow.h)
+
+## Support widgets and helpers
+
+- `ColumnSelectionDialog` — dialog shown when importing delimited files,
+  letting the user choose the source/target columns and separator.
+- `SettingsDialog` — application-wide preferences (colors, defaults).
+- `LargeNetworksManager` — adjusts rendering strategies when the loaded
+  network exceeds the interactive threshold.
+- `RecentFilesManager` — persistence of the recent-files list in
+  `QSettings`.
+- `WorkerThread` — base class for long-running tasks executed off the UI
+  thread.
+- `UIManager` — shared UI state (theme toggles, current panel focus).
+
+Headers:
+[`src/gui`](https://github.com/josemarinfarina/BasicSpanner/tree/main/src/gui)

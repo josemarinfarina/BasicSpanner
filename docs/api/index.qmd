@@ -1,0 +1,38 @@
+---
+title: "API Reference"
+sidebar: api
+---
+
+BasicSpanner is organized into two high-level modules:
+
+- **`src/core`** — platform-independent computation: graph data structures,
+  algorithms, configuration and the basic network engine.
+- **`src/gui`** — Qt-based graphical interface: main window, panels,
+  visualization widgets and helpers.
+
+The pages in this section summarize the public classes of each module and
+link directly to the corresponding headers on GitHub. A full Doxygen build
+of the source tree can be generated locally (see below) if a more
+exhaustive reference is needed.
+
+## Sections
+
+- [**Core**](core.qmd) — graphs, analysis configuration and the analysis
+  engine.
+- [**Algorithms**](algorithms.qmd) — low-level graph algorithms and
+  helpers used by the engine.
+- [**GUI**](gui.qmd) — main window, panels and visualization widgets.
+
+## Generating Doxygen locally
+
+A minimal `Doxyfile` can be generated from scratch and pointed at `src/`:
+
+```bash
+doxygen -g Doxyfile
+sed -i 's|^INPUT *=.*|INPUT = src|' Doxyfile
+sed -i 's|^RECURSIVE *=.*|RECURSIVE = YES|' Doxyfile
+sed -i 's|^EXTRACT_ALL *=.*|EXTRACT_ALL = YES|' Doxyfile
+doxygen Doxyfile
+```
+
+The HTML output is written to `html/index.html`.

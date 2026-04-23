@@ -1,0 +1,49 @@
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.quarto-title h1.title {
+  font-weight: 700;
+}
+
+pre.sourceCode {
+  border-radius: 6px;
+}
+
+.callout-note {
+  border-left-color: #2c7be5;
+}
+
+.callout-tip {
+  border-left-color: #00d4aa;
+}
+
+.section-title {
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+}
+
+table {
+  font-size: 0.95rem;
+}
+
+.hero-banner {
+  padding: 2.5rem 1rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.hero-banner h1 {
+  color: #00d4aa;
+  margin-bottom: 0.75rem;
+}
+
+.hero-banner .lead {
+  color: #cbd5e1;
+  font-size: 1.1rem;
+}

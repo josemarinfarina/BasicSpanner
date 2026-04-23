@@ -64,3 +64,8 @@ isolated_nodes.txt
 rejected_self_loops.txt
 *.log
 output/*
+
+# Quarto documentation site
+docs/_site/
+docs/.quarto/
+docs/_freeze/

@@ -13,6 +13,22 @@ Interactive C++/Qt6 application that computes **basic networks** from an input g
 
 ![Frontend Screenshot](./images/frontend.png)
 
+## Documentation
+
+Full documentation is published at
+[josemarinfarina.github.io/BasicSpanner](https://josemarinfarina.github.io/BasicSpanner/)
+and includes:
+
+- Installation and workflow guides.
+- An API reference for the `core`, `algorithms` and `gui` modules.
+
+The site is built with [Quarto](https://quarto.org/). To preview it locally:
+
+```bash
+cd docs
+quarto preview
+```
+
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE) for details.

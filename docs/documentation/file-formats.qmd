@@ -1,0 +1,97 @@
+---
+title: "File formats"
+sidebar: documentation
+---
+
+BasicSpanner reads plain-text edge lists and writes results in both CSV and
+plain-text formats compatible with third-party tools such as Gephi.
+
+## Input graph
+
+An input graph is a delimited text file in which each line defines a single
+undirected edge. Any of the following delimiters are supported:
+
+- Whitespace (space or tab)
+- Comma
+- Semicolon
+
+At import time, a column selection dialog allows the user to pick the
+*source* and *target* columns explicitly, so files with extra columns
+(weights, annotations, etc.) are also supported.
+
+### Minimal example
+
+```text
+1 4
+4 2
+2 5
+5 3
+```
+
+### Example with a header and extra columns
+
+```csv
+source,target,weight,score
+N001,N002,0.93,A
+N001,N003,0.71,B
+N002,N003,0.55,A
+```
+
+Self-loops and isolated nodes are detected and reported, but are not
+included in the analyses.
+
+## Seed file
+
+A seed file lists one node identifier per line. Leading or trailing
+whitespace is ignored.
+
+```text
+N001
+N002
+N003
+```
+
+Seeds that are not present in the imported network are reported and skipped.
+
+## Output files
+
+### Basic network edges
+
+Edge list of the basic network, exported as CSV or plain text. The format
+mirrors the input edge list, with optional `type` and `frequency` columns
+(the latter indicates how often a given connector appeared across
+replicates).
+
+### Node metrics
+
+Per-node statistics exported as CSV:
+
+| Column      | Description                                             |
+|-------------|---------------------------------------------------------|
+| `name`      | Node identifier.                                        |
+| `type`      | `Seed`, `Connector` or `Extra Connector`.               |
+| `deg_g`     | Degree in the full input graph.                         |
+| `deg_l`     | Degree in the basic network.                            |
+| `frequency` | Fraction of replicates in which the node appeared (0–1).|
+
+### Gephi-compatible metadata
+
+A two-column CSV (`Id;Label` plus all attributes) that can be imported in
+Gephi directly using *Data Laboratory &rarr; Import Spreadsheet*.
+
+### Real-time histogram table
+
+Exported as CSV, with one row per replicate:
+
+| Column       | Description                                   |
+|--------------|-----------------------------------------------|
+| `replicate`  | 1-based replicate index.                      |
+| `connectors` | Number of connectors in that replicate.       |
+| `elapsed_ms` | Replicate wall-clock time in milliseconds.    |
+
+## Example files
+
+A small set of synthetic networks and seed files is available in the
+[`examples/`](https://github.com/josemarinfarina/BasicSpanner/tree/main/examples)
+directory of the repository when present, or can be reconstructed by
+following the [getting started](getting-started.qmd) guide.

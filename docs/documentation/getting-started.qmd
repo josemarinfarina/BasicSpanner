@@ -1,0 +1,78 @@
+---
+title: "Getting started"
+sidebar: documentation
+---
+
+This page walks through a minimal analysis to verify that BasicSpanner is
+working correctly.
+
+## 1. Prepare an input graph
+
+Create a plain-text file with one edge per line. Tabs, spaces or commas are
+accepted as separators; the importer will let you select the appropriate
+columns and delimiter.
+
+```text
+1 4
+4 2
+2 5
+5 3
+1 6
+6 7
+7 3
+4 6
+5 7
+2 7
+```
+
+## 2. Prepare a seed list
+
+Create a second plain-text file with one node identifier per line:
+
+```text
+1
+2
+3
+```
+
+## 3. Load the network
+
+1. Launch `BasicSpanner`.
+2. Use the **File Operations** panel on the left sidebar to load the graph
+   file. A column selection dialog will appear; pick the *source* and *target*
+   columns and the appropriate delimiter.
+3. Verify in the status bar that the expected number of nodes and edges was
+   imported. Self-loops and isolated nodes are detected automatically.
+
+## 4. Load the seeds
+
+From the **Seed Selection** panel, choose *Load from file* and select the
+seed list you created above. The seeds are highlighted in red in the central
+viewer.
+
+## 5. Configure the analysis
+
+Open the **Algorithm Configuration** panel and set:
+
+- Number of replicates (default `100`).
+- Replicate mode: *Permutations of user seeds* or *Random seed batches*.
+- Number of parallel threads (default: all available cores).
+- Enable *Pruning* to obtain the optimal basic network.
+
+## 6. Run the analysis
+
+Press **Run Analysis** in the **Execution** panel. The floating *Real-Time
+Connector Histogram* window updates as each replicate finishes, showing the
+distribution of connector counts and summary statistics.
+
+## 7. Export results
+
+From the **Results and Export** panel you can save:
+
+- The basic network edge list as CSV or plain text.
+- Node-level metrics as CSV.
+- A Gephi-compatible node metadata file.
+- The full set of per-replicate statistics.
+
+Continue with the [workflow](workflow.qmd) and [algorithm](algorithm.qmd)
+pages for a deeper description of each step.
