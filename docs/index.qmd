@@ -12,7 +12,7 @@ Given a set of seeds, BasicSpanner computes the *basic network*: the
 minimal subgraph that preserves every pairwise distance among the seeds.
 :::
 
-![](../images/frontend.png){fig-align="center" width="90%"}
+![](images/frontend.png){fig-align="center" width="90%"}
 
 ## What is a basic network?
 

@@ -6,7 +6,7 @@ sidebar: documentation
 BasicSpanner exposes the full analysis pipeline through a single graphical
 interface organized in two sidebars and a central viewer.
 
-![](../../images/frontend.png){fig-align="center" width="100%"}
+![](../images/frontend.png){fig-align="center" width="100%"}
 
 ## Left sidebar
 

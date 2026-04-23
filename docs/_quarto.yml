@@ -10,7 +10,7 @@ website:
   repo-actions: [edit, issue]
   page-navigation: true
   search: true
-  favicon: ../images/frontend.png
+  favicon: images/frontend.png
   navbar:
     background: primary
     left:
