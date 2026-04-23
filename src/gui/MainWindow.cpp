@@ -415,14 +415,8 @@ Reduce permutation count, or use fewer seeds. Large networks (>10,000 nodes) may
 <div class="section">
 <h2>Use Cases</h2>
 
-<h3>Biological Networks</h3>
-<p>Find the minimal protein/gene pathway connecting disease-related genes. Identify essential mediators in signaling networks.</p>
-
-<h3>Social Networks</h3>
-<p>Discover key individuals connecting different communities. Identify information flow bottlenecks.</p>
-
-<h3>Infrastructure Networks</h3>
-<p>Find critical nodes in transportation or communication networks. Assess network vulnerability.</p>
+<h3>General Network Analysis</h3>
+<p>Given any undirected graph and a set of seed nodes of interest, BasicSpanner extracts the minimal induced subgraph that preserves every pairwise distance among the seeds. This reveals the essential connectors that mediate the relationships between seeds, independently of the application domain.</p>
 </div>
 
 <p style="margin-top: 40px; text-align: center; color: #64748b; font-size: 14px;">
@@ -878,9 +872,9 @@ void MainWindow::about()
            "network: the minimal set of additional nodes (connectors)\n"
            "required to preserve every pairwise distance among the seeds\n"
            "of the original graph.\n\n"
-           "Reference:\n"
-           "Marin J, Marin I. Extreme graph simplification applied to\n"
-           "functional discovery in biological networks (2026)."));
+           "Citation:\n"
+           "Marin J, Marin I. BasicSpanner. Zenodo (2026).\n"
+           "https://doi.org/10.5281/zenodo.19697430"));
 }
 
 void MainWindow::showUserGuide()

@@ -21,9 +21,9 @@
  * additional nodes (connectors) required to preserve all pairwise distances
  * that the seeds had in the original network.
  *
- * The tool was developed to support network-based functional discovery,
- * especially in biological interactomes, and to complement conventional
- * techniques such as community detection or Gene Ontology enrichment.
+ * The tool is designed to support network-based structural and functional
+ * analyses in arbitrary undirected graphs, and to complement conventional
+ * techniques such as community detection or shortest-path analysis.
  * BasicSpanner is implemented in C++ using the Qt framework and is available
  * for Linux and Windows.
  *
@@ -107,17 +107,16 @@
  *   distribution obtained from random seed sets of equal size provides a
  *   statistical measure of how closely related the chosen seeds are in the
  *   network.
- * - Complement Gene Ontology and community analyses: basic networks can
- *   highlight functional associations that conventional enrichment
- *   techniques fail to detect and can point out inconsistencies or
- *   omissions in existing annotation databases.
+ * - Complement community and enrichment analyses: basic networks can
+ *   highlight structural associations that conventional techniques fail to
+ *   detect and can point out inconsistencies or omissions in existing
+ *   annotations of the underlying network.
  * - Detect graph inconsistencies: when a single seed dramatically increases
  *   the number of required connectors, it often indicates that the seed is
  *   poorly related to the rest or that the underlying graph contains
  *   missing or erroneous data.
  *
- * Although the reference application domain is the analysis of biological
- * interactomes, the method is applicable to any undirected network.
+ * The method is applicable to any undirected network regardless of domain.
  *
  * @section about_usage Usage
  *
@@ -140,8 +139,8 @@
  *
  * If you use BasicSpanner in your work, please cite:
  *
- * Marin J, Marin I. Extreme graph simplification applied to functional
- * discovery in biological networks (2026).
+ * Marin J, Marin I. BasicSpanner. Zenodo (2026).
+ * https://doi.org/10.5281/zenodo.19697430
  *
  * @section about_license License
  *

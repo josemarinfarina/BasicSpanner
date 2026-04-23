@@ -62,8 +62,8 @@
  *
  * If you use BasicSpanner in your work, please cite:
  *
- * Marin J, Marin I. Extreme graph simplification applied to functional
- * discovery in biological networks (2026).
+ * Marin J, Marin I. BasicSpanner. Zenodo (2026).
+ * https://doi.org/10.5281/zenodo.19697430
  */
 
 #endif

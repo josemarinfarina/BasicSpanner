@@ -111,7 +111,7 @@ void LargeNetworksManager::setupUI()
 <p>Combines high clustering with short paths. Models social and neural networks.</p>
 
 <h4>Hierarchical Network</h4>
-<p>Modular structure with hierarchical levels. Useful for organizations and biological systems.</p>
+<p>Modular structure with hierarchical levels. Useful for modelling multi-level organizations.</p>
 
 <h3>Tips:</h3>
 <ul>
