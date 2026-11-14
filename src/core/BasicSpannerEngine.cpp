@@ -97,6 +97,7 @@ BasicNetworkResult BasicSpannerEngine::runSingleIteration_impl(const Graph& grap
                                                           int currentPermutation,
                                                           std::mt19937& rng,
                                                           PathManager& pathManager,
+                                                          bool solveTiesRandomly,
                                                           int threadId)
 {
     std::string logPrefix = (threadId >= 0) ? 
@@ -122,6 +123,16 @@ BasicNetworkResult BasicSpannerEngine::runSingleIteration_impl(const Graph& grap
 
     std::vector<int> seedPairIndices = pathManager.getCurrentSeedPairOrder();
     result.seedPairsOrder = seedPairIndices;
+
+    {
+        const int n = static_cast<int>(seedNodes.size());
+        result.seedNodesOrder.clear();
+        if (n >= 2 && static_cast<int>(seedPairIndices.size()) >= n - 1) {
+            result.seedNodesOrder.push_back(pathManager.getPairFromIndex(0).first);
+            for (int k = 0; k < n - 1; ++k)
+                result.seedNodesOrder.push_back(pathManager.getPairFromIndex(k).second);
+        }
+    }
 
     int max_dist = 0;
     for(const auto& p : pathManager.getAllPaths()) max_dist = std::max(max_dist, (int)p.size() - 1);
@@ -268,6 +279,11 @@ BasicNetworkResult BasicSpannerEngine::runSingleIteration_impl(const Graph& grap
         }
     }
     
+    if (solveTiesRandomly) {
+        int removed = resolveInterchangeableTies(pathManager, result.seedNodes, rng);
+        logProgress(logPrefix + " Solve ties randomly: deactivated " + std::to_string(removed) + " interchangeable paths");
+    }
+
     std::set<int> finalNodes = pathManager.getNodesInActivePaths();
     std::set<int> finalConnectors;
     for (int node : finalNodes) {
@@ -305,7 +321,64 @@ BasicNetworkResult BasicSpannerEngine::runSingleIteration(const Graph& graph,
                                                      int currentPermutation, int totalPermutations,
                                                      std::mt19937& rng,
                                                      PathManager& pathManager) {
-    return runSingleIteration_impl(graph, seedNodes, currentPermutation, rng, pathManager, -1);
+    return runSingleIteration_impl(graph, seedNodes, currentPermutation, rng, pathManager, config_.randomPruning, -1);
+}
+
+int BasicSpannerEngine::resolveInterchangeableTies(PathManager& pathManager,
+                                                   const std::set<int>& seedNodes,
+                                                   std::mt19937& rng) {
+    const auto& allPaths = pathManager.getAllPaths();
+    const std::vector<int> pairOrder = pathManager.getCurrentSeedPairOrder();
+
+    // Number of active paths (over all seed pairs) through each interior node.
+    std::unordered_map<int, int> activeUse;
+    for (int pairIndex : pairOrder) {
+        auto pair = pathManager.getPairFromIndex(pairIndex);
+        for (int pathIndex : pathManager.getActivePathIndicesBetweenSeeds(pair.first, pair.second)) {
+            const auto& path = allPaths[pathIndex];
+            for (size_t k = 1; k + 1 < path.size(); ++k) activeUse[path[k]]++;
+        }
+    }
+
+    int removed = 0;
+    for (int pairIndex : pairOrder) {
+        auto pair = pathManager.getPairFromIndex(pairIndex);
+        auto pathIndices = pathManager.getActivePathIndicesBetweenSeeds(pair.first, pair.second);
+        if (pathIndices.size() < 2) continue;
+
+        std::unordered_map<int, int> ownUse;
+        for (int pathIndex : pathIndices) {
+            const auto& path = allPaths[pathIndex];
+            for (size_t k = 1; k + 1 < path.size(); ++k) ownUse[path[k]]++;
+        }
+
+        // A path is interchangeable when every interior node is used only by this pair.
+        std::vector<int> interchangeable;
+        for (int pathIndex : pathIndices) {
+            const auto& path = allPaths[pathIndex];
+            bool exclusive = true;
+            for (size_t k = 1; k + 1 < path.size(); ++k) {
+                int node = path[k];
+                if (seedNodes.count(node) || activeUse[node] != ownUse[node]) {
+                    exclusive = false;
+                    break;
+                }
+            }
+            if (exclusive) interchangeable.push_back(pathIndex);
+        }
+        if (interchangeable.size() < 2) continue;
+
+        std::uniform_int_distribution<size_t> pick(0, interchangeable.size() - 1);
+        const int keep = interchangeable[pick(rng)];
+        for (int pathIndex : interchangeable) {
+            if (pathIndex == keep) continue;
+            const auto& path = allPaths[pathIndex];
+            for (size_t k = 1; k + 1 < path.size(); ++k) activeUse[path[k]]--;
+            pathManager.deactivatePath(pathIndex);
+            removed++;
+        }
+    }
+    return removed;
 }
 
 std::unordered_map<std::pair<int, int>, int, PairHash> BasicSpannerEngine::calculateSeedDistances(
@@ -620,7 +693,7 @@ bool BasicSpannerEngine::isNodeInPaths(int node, const std::vector<std::vector<i
 
 std::vector<BasicNetworkResult> BasicSpannerEngine::pruneBasicNetwork(
     const BasicNetworkResult& tiedNetworkInput, const Graph& originalGraph,
-    const AnalysisConfig& config, PruningNodeAnalysis* pruningAnalysis) {
+    const AnalysisConfig& config, std::mt19937& rng, PruningNodeAnalysis* pruningAnalysis) {
 
     std::vector<BasicNetworkResult> prunedSolutions;
     if (!tiedNetworkInput.isValid || tiedNetworkInput.connectorNodes.empty()) {
@@ -642,9 +715,7 @@ std::vector<BasicNetworkResult> BasicSpannerEngine::pruneBasicNetwork(
     while(improvementMadeInLastPass) {
         improvementMadeInLastPass = false;
         
-        if(config.randomPruning) {
-            std::shuffle(connectorsToTry.begin(), connectorsToTry.end(), randomGenerator_);
-        }
+        std::shuffle(connectorsToTry.begin(), connectorsToTry.end(), rng);
 
         auto iterator = connectorsToTry.begin();
         while (iterator != connectorsToTry.end()) {
@@ -696,6 +767,7 @@ std::vector<BasicNetworkResult> BasicSpannerEngine::pruneBasicNetwork(
     const BasicNetworkResult& tiedNetworkInput,
     const Graph& originalGraph,
     const BasicSpannerConfig& config,
+    std::mt19937& rng,
     PruningNodeAnalysis* pruningAnalysis) {
 
     std::vector<BasicNetworkResult> prunedSolutions;
@@ -718,9 +790,7 @@ std::vector<BasicNetworkResult> BasicSpannerEngine::pruneBasicNetwork(
     while(improvementMadeInLastPass) {
         improvementMadeInLastPass = false;
         
-        if(config.randomPruning) {
-            std::shuffle(connectorsToTry.begin(), connectorsToTry.end(), randomGenerator_);
-        }
+        std::shuffle(connectorsToTry.begin(), connectorsToTry.end(), rng);
 
         auto iterator = connectorsToTry.begin();
         while (iterator != connectorsToTry.end()) {
@@ -879,6 +949,7 @@ AllPermutationResults BasicSpannerEngine::findBasicNetworkWithAllResults(
     const Graph& graph, const std::vector<int>& seedNodes, PathManager& masterPathManager, const BasicSpannerConfig& config)
 {
     config_ = config;
+    randomGenerator_.seed(config_.randomSeed);
     
     AllPermutationResults finalResultsCollection;
     
@@ -926,9 +997,9 @@ AllPermutationResults BasicSpannerEngine::findBasicNetworkWithAllResults(
         if (iterationResult.isValid) {
             iterationResult.preTotalConnectors = iterationResult.totalConnectors;
 
-            const bool pruningEnabled = (config_.enablePruning || config_.randomPruning);
+            const bool pruningEnabled = config_.enablePruning;
             if (pruningEnabled && iterationResult.basicNetwork_ptr) {
-                auto perPermPruned = pruneBasicNetwork(iterationResult, graph, config, nullptr);
+                auto perPermPruned = pruneBasicNetwork(iterationResult, graph, config, randomGenerator_, nullptr);
                 if (!perPermPruned.empty() && perPermPruned.back().isValid) {
                     int preCount = iterationResult.preTotalConnectors;
                     iterationResult = std::move(perPermPruned.back());
@@ -1028,7 +1099,7 @@ AllPermutationResults BasicSpannerEngine::findBasicNetworkWithAllResults(
             finalResultsCollection.bestResult.isTiedNetwork = true;
         } 
         
-        if ((config_.enablePruning || config_.randomPruning) && finalResultsCollection.bestResult.basicNetwork_ptr) {
+        if (config_.enablePruning && finalResultsCollection.bestResult.basicNetwork_ptr) {
             logProgress("Per-permutation pruning already applied during heuristic loop. Skipping redundant final pruning pass. Final connectors: " +
                        std::to_string(finalResultsCollection.bestResult.totalConnectors));
         }

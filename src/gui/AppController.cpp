@@ -1418,9 +1418,7 @@ QString AppController::formatBatchResults(const BatchAnalysisResult& result)
         stream << "ALGORITHM CONFIGURATION:\n";
         stream << "  - Permutations: " << lastConfig_.numPermutations << "\n";
         stream << "  - Pruning: " << (lastConfig_.enablePruning ? "Yes" : "No") << "\n";
-        if (lastConfig_.enablePruning) {
-            stream << "  - Random pruning (ties): " << (lastConfig_.randomPruning ? "Yes" : "No") << "\n";
-        }
+        stream << "  - Solve ties randomly: " << (lastConfig_.randomPruning ? "Yes" : "No") << "\n";
         stream << "  - Parallel execution: " << (lastConfig_.enableParallelExecution ? "Yes" : "No") << "\n";
         if (lastConfig_.enableParallelExecution) {
             stream << "  - Max threads: " << lastConfig_.maxThreads << "\n";

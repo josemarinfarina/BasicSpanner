@@ -299,9 +299,9 @@ std::vector<BasicNetworkResult> ParallelBasicSpannerEngine::runPermutationBatch(
         if (iteration_result.isValid) {
             iteration_result.preTotalConnectors = iteration_result.totalConnectors;
 
-            const bool pruningEnabled = (parallel_config_.enablePruning || parallel_config_.randomPruning);
+            const bool pruningEnabled = parallel_config_.enablePruning;
             if (pruningEnabled && iteration_result.basicNetwork_ptr) {
-                auto perPermPruned = pruneBasicNetwork(iteration_result, graph, static_cast<const BasicSpannerConfig&>(parallel_config_), nullptr);
+                auto perPermPruned = pruneBasicNetwork(iteration_result, graph, static_cast<const BasicSpannerConfig&>(parallel_config_), thread_local_random_generator, nullptr);
                 if (!perPermPruned.empty() && perPermPruned.back().isValid) {
                     int preCount = iteration_result.preTotalConnectors;
                     int permNumber = iteration_result.permutationNumber;
@@ -356,9 +356,9 @@ std::vector<BasicNetworkResult> ParallelBasicSpannerEngine::runPermutationBatch(
         if (iteration_result.isValid) {
             iteration_result.preTotalConnectors = iteration_result.totalConnectors;
 
-            const bool pruningEnabled = (parallel_config_.enablePruning || parallel_config_.randomPruning);
+            const bool pruningEnabled = parallel_config_.enablePruning;
             if (pruningEnabled && iteration_result.basicNetwork_ptr) {
-                auto perPermPruned = pruneBasicNetwork(iteration_result, graph, static_cast<const BasicSpannerConfig&>(parallel_config_), nullptr);
+                auto perPermPruned = pruneBasicNetwork(iteration_result, graph, static_cast<const BasicSpannerConfig&>(parallel_config_), thread_local_random_generator, nullptr);
                 if (!perPermPruned.empty() && perPermPruned.back().isValid) {
                     int preCount = iteration_result.preTotalConnectors;
                     int permNumber = iteration_result.permutationNumber;
@@ -626,7 +626,7 @@ AllParallelPermutationResults ParallelBasicSpannerEngine::findBasicNetworkParall
          * PAPER ALGORITHM INTEGRATION: Apply final pruning as integral part of algorithm
          * This resolves tied networks that the heuristic phase could not simplify further
          */
-        if ((config.enablePruning || config.randomPruning) && finalResultsCollection.bestResult.basicNetwork_ptr) {
+        if (config.enablePruning && finalResultsCollection.bestResult.basicNetwork_ptr) {
             logProgress("Per-permutation pruning already applied during parallel heuristic phase. Skipping redundant final pruning pass. Final connectors: " +
                        std::to_string(finalResultsCollection.bestResult.totalConnectors));
         }
@@ -721,5 +721,5 @@ BasicNetworkResult ParallelBasicSpannerEngine::runSingleIterationParallel(
     std::mt19937& rng,
     PathManager& pathManager) {
     
-    return runSingleIteration_impl(graph, seedNodes, currentPermutation, rng, pathManager, threadId);
+    return runSingleIteration_impl(graph, seedNodes, currentPermutation, rng, pathManager, parallel_config_.randomPruning, threadId);
 }

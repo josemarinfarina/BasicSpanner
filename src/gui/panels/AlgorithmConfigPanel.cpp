@@ -63,7 +63,7 @@ void AlgorithmConfigPanel::setupUI()
 
     randomPruningCheckBox_ = new QCheckBox;
     randomPruningCheckBox_->setChecked(false);
-    randomPruningCheckBox_->setToolTip("Resolve ties randomly during pruning");
+    randomPruningCheckBox_->setToolTip("After the heuristic, keep one random path among interchangeable tied paths between two seeds");
     topFormLayout->addRow("Solve Ties Randomly:", randomPruningCheckBox_);
 
     configLayout->addLayout(topFormLayout);

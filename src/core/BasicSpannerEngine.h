@@ -733,6 +733,7 @@ protected:
      * @param currentPermutation The index of the current permutation.
      * @param rng The random number generator for this permutation.
      * @param pathManager The PathManager instance containing all paths.
+     * @param solveTiesRandomly Keep one random path among interchangeable tied paths after the heuristic.
      * @param threadId The ID of the thread executing this task (-1 for main thread).
      * @return A BasicNetworkResult containing the found network and its metadata.
      */
@@ -741,7 +742,23 @@ protected:
                                                int currentPermutation,
                                                std::mt19937& rng,
                                                PathManager& pathManager,
+                                               bool solveTiesRandomly,
                                                int threadId = -1);
+
+    /**
+     * @brief Post-processing of the heuristic: resolve ties between interchangeable paths.
+     *
+     * For each seed pair, an active path is interchangeable when none of its
+     * interior nodes is a seed or lies on an active path of another seed pair,
+     * so it serves only that pair. Among two or more such paths one is kept at
+     * random and the rest are deactivated. Every pair keeps at least one
+     * geodesic, so all seed-to-seed distances are preserved.
+     *
+     * @return Number of paths deactivated.
+     */
+    int resolveInterchangeableTies(PathManager& pathManager,
+                                   const std::set<int>& seedNodes,
+                                   std::mt19937& rng);
 
     
     /**
@@ -829,6 +846,7 @@ protected:
      * 
      * @param tiedNetworkInput The result from the main algorithm, potentially with tied connectors.
      * @param originalGraph The full, original graph.
+     * @param rng Generator used to shuffle the order in which connectors are tried.
      * @param pruningAnalysis Optional pointer to a struct for detailed pruning analysis.
      * @return A vector of possible pruned network results. Currently, returns one minimal solution.
      */
@@ -836,6 +854,7 @@ protected:
         const BasicNetworkResult& tiedNetworkInput, 
         const Graph& originalGraph,
         const AnalysisConfig& config,
+        std::mt19937& rng,
         PruningNodeAnalysis* pruningAnalysis = nullptr
     );
     
@@ -845,6 +864,7 @@ protected:
      * @param tiedNetworkInput The result from the main algorithm, potentially with tied connectors.
      * @param originalGraph The full, original graph.
      * @param config Configuration parameters
+     * @param rng Generator used to shuffle the order in which connectors are tried.
      * @param pruningAnalysis Optional pointer to a struct for detailed pruning analysis.
      * @return A vector of possible pruned network results. Currently, returns one minimal solution.
      */
@@ -852,6 +872,7 @@ protected:
         const BasicNetworkResult& tiedNetworkInput, 
         const Graph& originalGraph,
         const BasicSpannerConfig& config,
+        std::mt19937& rng,
         PruningNodeAnalysis* pruningAnalysis = nullptr
     );
     
